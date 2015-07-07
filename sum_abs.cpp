@@ -7,18 +7,18 @@ using namespace std;
 
 inline
 int abs(int v) {
-    int mask = v >> 31;
+    int mask = (unsigned int)v >> 31;
     return (mask ^ v) - mask;
 }
 
 
 inline
 void solve(const int* A, int size, int L, int R) {
-    int cur = L+1;
-    int end = R+1;
+    int cur = L-1;
+    int end = R-1;
     int sum = abs(A[cur++]);
 
-    for (; cur < end;)
+    for (; cur <= end;)
         sum = abs(sum + A[cur++]);
 
     cout << (sum & 1 ? "Odd" : "Even") << "\n"; 
