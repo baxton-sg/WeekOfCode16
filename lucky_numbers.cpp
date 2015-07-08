@@ -11,7 +11,7 @@ using namespace std;
 
 typedef unsigned long long ULONG;
 
-const int MASK = 1000000000 + 7;
+const ULONG MASK = 1000000000 + 7;
 const int MAX_NUMBERS = 100 * 100 * 100;
 
 
@@ -66,11 +66,9 @@ void get_sum(vector<int>& numbers, size_t size, int init_val, unordered_set<int>
     if (current >= size)
         return;
 
-    if (memo.end() == memo.find(init_val)) {
-        memo.insert(init_val);
-        sum += init_val;
-    } 
-    get_sum(numbers, size, init_val, memo, current+1, sum);   
+
+    get_sum(numbers, size, init_val, memo, current+1, sum);
+
 
     for (size_t i = current+1; i < size; ++i) {
         if (numbers[current] == numbers[i])
@@ -89,9 +87,9 @@ void get_sum(vector<int>& numbers, size_t size, int init_val, unordered_set<int>
             sum += tmp;
         
 
-        swap(numbers[current], numbers[i]);
-        get_sum(numbers, size, tmp, memo, current+1, sum);
-        swap(numbers[current], numbers[i]);
+            swap(numbers[current], numbers[i]);
+            get_sum(numbers, size, tmp, memo, current+1, sum);
+            swap(numbers[current], numbers[i]);
         }
     }
 
@@ -107,12 +105,15 @@ int solve(int x, int y, int z) {
     for (int i = 0; i <= x; ++i) {
         for (int j = 0; j <= y; ++j) {
             for (int k = 0; k <= z; ++k) {
-               size_t size = fill_numbers(i, j, k, numbers);
-               int n = get_num(numbers, size);
-               get_sum(numbers, size, n, memo, 0, sum);
+                size_t size = fill_numbers(i, j, k, numbers);
 
-//               numbers.clear();
-//               memo.clear();
+                if (size) {
+                     int n = get_num(numbers, size);
+                     memo.insert(n);
+                     sum += n;
+
+                     get_sum(numbers, size, n, memo, 0, sum);
+                }
             }
         }
     }
