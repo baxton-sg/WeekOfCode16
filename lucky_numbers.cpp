@@ -7,6 +7,7 @@
 using namespace std;
 
 typedef unsigned long long ULONG;
+typedef long long LONG;
 
 const ULONG MASK = 1000000000 + 7;
 
@@ -14,87 +15,149 @@ const ULONG MASK = 1000000000 + 7;
 
 
 void add(int num, int num_zeros, ULONG& sum) {
-    if (num_zeros <= 8) {
-        sum += num * pow(10, num_zeros);
-cout << (num * pow(10, num_zeros)) << endl;
-    }
-    else {
-        int mul = num_zeros / 8; // 8 <= 100M
-        int deg = num_zeros - mul * 8;
-        int val = num * pow(10, deg) * mul * 999307;
+    ULONG ll = 8;
+    ULONG mod = (ULONG)pow(10, ll) % MASK;
 
-        sum += val;
+    int mul = num_zeros / ll;
+    int deg = num_zeros - mul * ll;
+
+    ULONG val = num * (ULONG)pow(10, deg);
+
+    for (int i = 0; i < mul; ++i) {
+        val *= mod;
+        val %= MASK;
     }
-    sum = sum % MASK;
+
+    sum = (sum + val) % MASK;
+}
+
+inline
+bool is_div(int n, int d) {
+    return 0 == (n % d);
 }
 
 
-ULONG fact(ULONG n) {
-    ULONG res = 1;
-    while (n) 
-        res *= n--;
-    return res;
+
+void reduce(ULONG& comb, int x, int y, int z) {
+    while(is_div(x, 2) && is_div(y, 2) && is_div(z, 2)) {
+        comb /= 2;
+        x /= 2;
+        y /= 2;
+        z /= 2;
+    }
+
+    while(is_div(x, 3) && is_div(y, 3) && is_div(z, 3)) {
+        comb /= 3;
+        x /= 3;
+        y /= 3;
+        z /= 3;
+    }
+
+    while(is_div(x, 5) && is_div(y, 5) && is_div(z, 5)) {
+        comb /= 5;
+        x /= 5;
+        y /= 5;
+        z /= 5;
+    }
+
+    while(is_div(x, 7) && is_div(y, 7) && is_div(z, 7)) {
+        comb /= 7;
+        x /= 7;
+        y /= 7;
+        z /= 7;
+    }
 }
+
+
+
+ULONG get_comb(int cod, int x, int y, int z) {
+    double res = 1;
+    while (cod && x && y && z) {
+        res *= cod--;
+        res /= x--;
+        res /= y--;
+        res /= z--;
+    }
+
+    while(cod && x) {
+        res *= cod--;
+        res /= x--;
+    }
+
+    while(cod && y) {
+        res *= cod--;
+        res /= y--;
+    }
+
+    while(cod && z) {
+        res *= cod--;
+        res /= z--;
+    }
+
+    while(cod)
+        res *= cod--;
+
+   
+    return (ULONG)res;        
+}
+
 
 void solve_partially(int x, int y, int z, ULONG& sum) {
 
     if (0 == (x + y + z))
         return;
 
-cout << x << " " << y << " " << z << endl;
+    LONG deg = x + y + z - 1;
+    LONG cod = x + y + z;
 
-    int deg = x + y + z - 1;
-    int cod = x + y + z;
+    ULONG comb = get_comb(cod, x, y, z);
+    if (comb >= cod)
+        reduce(comb, x, y, z);
 
-    int comb = fact(cod);
-    if (x > 1)
-        comb /= fact(x);
-    if (y > 1)
-        comb /= fact(y);
-    if (z > 1)
-        comb /= fact(z);
-    
 
     if (x) {
-        int rep = comb >= cod ? comb / cod * x : comb;
-        int tmp_deg = deg;
-        while (rep--) {
+        LONG rep = comb >= cod ? comb / cod * x : comb;
+        LONG tmp_deg = deg;
+        //while (rep--) {
+            ULONG tmp_sum = 0;
             while(tmp_deg >= 0) {
-                add(4, tmp_deg, sum);
+                add(4, tmp_deg, tmp_sum);
                 --tmp_deg;
             }
+            sum += (tmp_sum * rep) % MASK;
             sum = sum % MASK;
-            tmp_deg = deg;
-cout << "sum: " << sum << endl;
-        }
+        //    tmp_deg = deg;
+        //}
     }
 
     if (y) {
-        int rep = comb >= cod ? comb / cod * y : comb;
-        int tmp_deg = deg;
-        while (rep--) {
+        LONG rep = comb >= cod ? comb / cod * y : comb;
+        LONG tmp_deg = deg;
+        //while (rep--) {
+            ULONG tmp_sum = 0;
             while(tmp_deg >= 0) {
-                add(5, tmp_deg, sum);
+                add(5, tmp_deg, tmp_sum);
                 --tmp_deg;
             }
+            sum += (tmp_sum * rep) % MASK;
             sum = sum % MASK;
-            tmp_deg = deg;
-cout << "sum: " << sum << endl;
-        }
+        //    tmp_deg = deg;
+        //}
     }
 
     if (z) {
-        int rep = comb >= cod ? comb / cod * z : comb;
-        int tmp_deg = deg;
-        while (rep--) {
+        LONG rep = comb >= cod ? comb / cod * z : comb;
+        LONG tmp_deg = deg;
+        //while (rep--) {
+            ULONG tmp_sum = 0;
             while(tmp_deg >= 0) {
-                add(6, tmp_deg, sum);
+                add(6, tmp_deg, tmp_sum);
                 --tmp_deg;
             }
+            sum += (tmp_sum * rep) % MASK;
             sum = sum % MASK;
-            tmp_deg = deg;
-cout << "sum: " << sum << endl;
-        }
+        //    tmp_deg = deg;
+        //}
     }
 }
 
